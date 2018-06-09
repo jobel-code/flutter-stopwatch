@@ -1,5 +1,6 @@
 /*
-Credits to: https://github.com/bizz84/stopwatch-flutter/blob/master/lib/timer_page.dart
+Credits to:
+https://github.com/bizz84/stopwatch-flutter/blob/master/lib/timer_page.dart
 
 LICENCE:
 Copyright (c) 2018 Andrea Bizzotto mailto:bizz84@gmail.com
