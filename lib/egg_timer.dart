@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttery/framing.dart';
+import 'egg_timer_time_display.dart';
 
 final Color GRADIENT_TOP = const Color(0xFFF5F5F5);
 final Color GRADIENT_BOTTOM = const Color(0xFFE8E8E8);
@@ -15,14 +16,11 @@ class MyApp extends StatelessWidget {
         body: Center(
           child: Column(
             children: <Widget>[
-              RandomColorBlock(
-                width: double.infinity,
-                height: 150.0,
-              ),
+              EggTimerTimeDisplay(),
               RandomColorBlock(
                 width: double.infinity,
                 child: Padding(
-                  padding: EdgeInsets.all(30.0),
+                  padding: EdgeInsets.only(left: 30.0, right: 30.0),
                   child: AspectRatio(
                     aspectRatio: 1.0,
                     child: RandomColorBlock(
