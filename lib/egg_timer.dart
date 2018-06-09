@@ -2,7 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:fluttery/framing.dart';
-import 'egg_timer_time_display.dart';
+import 'package:stopwatch/egg_timer_controls.dart';
+import 'package:stopwatch/egg_timer_time_display.dart';
 import 'package:stopwatch/egg_timer_button.dart';
 
 //final Color GRADIENT_TOP = const Color(0xFFF5F5F5);
@@ -36,14 +37,8 @@ class MyApp extends StatelessWidget {
                 child: Container(),
               ),
 
-              Row(
-                children: <Widget>[
-                  EggTimerButton(icon: Icons.refresh, text: 'RESTART',),
-                  Expanded(child: Container(),),
-                  EggTimerButton(icon: Icons.arrow_back, text: 'RESET',),
-                ],
-              ),
-               EggTimerButton(icon: Icons.pause, text: 'Pause',),
+              EggTimerControls(),
+
                // From Fluttery/framing
             ],
           ),
