@@ -14,6 +14,27 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 import 'package:flutter/material.dart';
 import 'dart:async';
 
+
+
+class MyApp extends StatefulWidget  {
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> with TickerProviderStateMixin {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        child: TimerPage(),
+      ),
+    );
+  }
+}
+
+
+
+
 class ElapsedTime {
   final int hundreds;
   final int seconds;
