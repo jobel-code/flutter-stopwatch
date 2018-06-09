@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
               RandomColorBlock(
                 width: double.infinity,
                 child: Padding(
-                  padding: EdgeInsets.only(left: 30.0, right: 30.0),
+                  padding: EdgeInsets.only(left: 45.0, right: 45.0),
                   child: AspectRatio(
                     aspectRatio: 1.0,
                     child: RandomColorBlock(
@@ -36,11 +36,14 @@ class MyApp extends StatelessWidget {
                 child: Container(),
               ),
 
-              RandomColorBlock(
-                width: double.infinity,
-                height: 50.0,
+              Row(
+                children: <Widget>[
+                  EggTimerButton(icon: Icons.refresh, text: 'RESTART',),
+                  Expanded(child: Container(),),
+                  EggTimerButton(icon: Icons.arrow_back, text: 'RESET',),
+                ],
               ),
-               EggTimerButton(),
+               EggTimerButton(icon: Icons.pause, text: 'Pause',),
                // From Fluttery/framing
             ],
           ),
