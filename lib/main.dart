@@ -11,5 +11,6 @@ void main() => runApp(MaterialApp(
     primarySwatch: Colors.blue,
   ),
   home: MyApp(),
-));
+),
+);
 
