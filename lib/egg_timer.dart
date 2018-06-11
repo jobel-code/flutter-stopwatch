@@ -7,11 +7,19 @@ import 'package:stopwatch/egg_timer_time_display.dart';
 // import 'package:stopwatch/egg_timer_button.dart'; // Used now within the controls
 import 'package:stopwatch/egg_timer_dial.dart';
 
-
 final Color GRADIENT_TOP = const Color(0xFFF5F5F5);
 final Color GRADIENT_BOTTOM = const Color(0xFFE8E8E8);
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  final EggTimer eggTimer;
+
+  _MyAppState() : eggTimer = EggTimer(maxTime: Duration(minutes: 35));
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -30,7 +38,11 @@ class MyApp extends StatelessWidget {
             child: Column(
               children: <Widget>[
                 EggTimerTimeDisplay(),
-                EggTimerDial(),
+                EggTimerDial(
+                  currentTime: eggTimer.currentTime,
+                  maxTime: eggTimer.maxTime,
+                  ticksPerSection: 5,
+                ),
 
                 Expanded(
                   child: Container(),
@@ -46,4 +58,32 @@ class MyApp extends StatelessWidget {
       ),
     );
   }
+}
+
+class EggTimer {
+  final Duration maxTime;
+
+  // Defaults
+  Duration _currentTime = Duration(seconds: 0);
+  EggTimerState state = EggTimerState.ready;
+
+  EggTimer({this.maxTime});
+
+  get currentTime {
+    return _currentTime;
+  }
+
+  set currentTime(newTime) {
+    // only allows the time change under certain circumstances.
+    // only when ready and not while running.
+    if (state == EggTimerState.ready) {
+      _currentTime = newTime;
+    }
+  }
+}
+
+enum EggTimerState {
+  ready,
+  running,
+  paused,
 }
