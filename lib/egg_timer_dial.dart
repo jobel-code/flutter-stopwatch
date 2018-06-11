@@ -89,18 +89,23 @@ class TickPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+    // moving center of canvas to the center of the circles
     canvas.translate(size.width / 2, size.height / 2);
 
     // Saving position before rotating canvas.
     canvas.save();
 
+    // radius to draw the offset
     final radius = size.width / 2;
 
     // Painting short ticks.
     for (var i = 0; i < tickCount; ++i) {
+
+      final tickLength = i % ticksPerSection == 0 ? LONG_TICK : SHORT_TICK;
+
       canvas.drawLine(
           Offset(0.0, radius),
-          Offset(0.0, radius -SHORT_TICK), // negative goes up
+          Offset(0.0, radius + tickLength), // negative goes up // plus keeps it on the exterior
           tickPaint
       );
       
