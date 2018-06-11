@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 // import 'timer_page.dart';  // from Andrea Bizzotto https://github.com/bizz84/stopwatch-flutter/blob/master/lib/timer_page.dart
 // import 'count_down_timer.dart';
-import 'egg_timer_main.dart';
+import 'package:stopwatch/egg_timer/egg_timer_main.dart';
 
 
 void main() => runApp(MaterialApp(

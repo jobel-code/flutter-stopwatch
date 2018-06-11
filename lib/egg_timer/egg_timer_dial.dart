@@ -1,9 +1,9 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:stopwatch/egg_timer_knob.dart';
+import 'package:stopwatch/egg_timer/egg_timer_knob.dart';
 import 'package:fluttery/gestures.dart';
-import 'egg_timer.dart';
+import 'package:stopwatch/egg_timer/egg_timer.dart';
 
 // ignore: non_constant_identifier_names
 final Color GRADIENT_TOP = const Color(0xFFF5F5F5);

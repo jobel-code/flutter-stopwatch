@@ -1,12 +1,12 @@
 // Inspired by https://www.youtube.com/watch?v=svxUUz5mi9s&t=2147s
 
 import 'package:flutter/material.dart';
-import 'package:stopwatch/egg_timer.dart';
+import 'package:stopwatch/egg_timer/egg_timer.dart';
 // import 'package:fluttery/framing.dart';  // used for prototypes.
-import 'package:stopwatch/egg_timer_controls.dart';
-import 'package:stopwatch/egg_timer_time_display.dart';
+import 'package:stopwatch/egg_timer/egg_timer_controls.dart';
+import 'package:stopwatch/egg_timer/egg_timer_time_display.dart';
 // import 'package:stopwatch/egg_timer_button.dart'; // Used now within the controls
-import 'package:stopwatch/egg_timer_dial.dart';
+import 'package:stopwatch/egg_timer/egg_timer_dial.dart';
 
 // ignore: non_constant_identifier_names
 final Color GRADIENT_TOP = const Color(0xFFF5F5F5);

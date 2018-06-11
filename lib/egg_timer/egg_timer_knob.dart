@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
-
 // ignore: non_constant_identifier_names
 final Color GRADIENT_TOP = const Color(0xFFF5F5F5);
 // ignore: non_constant_identifier_names
@@ -24,12 +23,11 @@ class _EggTimerDialKnobState extends State<EggTimerDialKnob> {
   @override
   Widget build(BuildContext context) {
     return Stack(
-        children: [
-
-          Container(
-            width: double.infinity,
-            height: double.infinity,
-            child: CustomPaint(
+      children: [
+         Container(
+          width: double.infinity,
+          height: double.infinity,
+          child: CustomPaint(
               // Independently transform the widget to rotate.
               painter: ArrowPainter(
                 rotationPercent: widget.rotationPercent,

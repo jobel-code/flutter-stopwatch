@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:stopwatch/egg_timer.dart';
-import 'package:stopwatch/egg_timer_button.dart';
+import 'package:stopwatch/egg_timer/egg_timer.dart';
+import 'package:stopwatch/egg_timer/egg_timer_button.dart';
 
 class EggTimerControls extends StatefulWidget {
 
