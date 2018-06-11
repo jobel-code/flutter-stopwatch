@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:stopwatch/egg_timer_knob.dart';
 
@@ -87,14 +89,32 @@ class TickPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    canvas.translate(size.width / 2, 0.0);
-    canvas.drawLine(
-        Offset(0.0, 0.0), 
-        Offset(0.0, -SHORT_TICK), // negative goes up
-        tickPaint);
-    
+    canvas.translate(size.width / 2, size.height / 2);
+
+    // Saving position before rotating canvas.
+    canvas.save();
+
+    final radius = size.width / 2;
+
+    // Painting short ticks.
+    for (var i = 0; i < tickCount; ++i) {
+      canvas.drawLine(
+          Offset(0.0, radius),
+          Offset(0.0, radius -SHORT_TICK), // negative goes up
+          tickPaint
+      );
+      
+      canvas.rotate(2 * pi / tickCount);
+    }
+
+    // restore after drawing all ticks
+    canvas.restore();
+
 
   }
+  
+  
+  
 
   @override
   bool shouldRepaint(CustomPainter oldDelegate) {
