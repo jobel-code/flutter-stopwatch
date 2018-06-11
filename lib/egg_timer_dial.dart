@@ -4,11 +4,34 @@ import 'package:flutter/material.dart';
 import 'package:stopwatch/egg_timer_knob.dart';
 
 class EggTimerDial extends StatefulWidget {
+
+  // Parameterized dial
+  final Duration currentTime;
+  final Duration maxTime; // Tell us how many ticks to draw
+  final int ticksPerSection;
+
+  // constructor with defaults
+  EggTimerDial({
+    this.currentTime = const Duration(minutes: 0),
+    this.maxTime = const Duration(minutes: 35),
+    this.ticksPerSection = 5,
+  });
+
+
+
   @override
   _EggTimerDialState createState() => _EggTimerDialState();
 }
 
 class _EggTimerDialState extends State<EggTimerDial> {
+
+
+  _rotationPercent() {
+    return widget.currentTime.inSeconds / widget.maxTime.inSeconds;
+  }
+
+
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -41,11 +64,16 @@ class _EggTimerDialState extends State<EggTimerDial> {
 
                 width: double.infinity,
                 height: double.infinity,
-                child: CustomPaint(painter: TickPainter()),
+                child: CustomPaint(painter: TickPainter(
+                  tickCount: widget.maxTime.inMinutes,
+                  ticksPerSection: widget.ticksPerSection,
+                )),
               ),
               Padding(
                 padding: const EdgeInsets.all(65.0),
-                child: EggTimerDialKnob(),
+                child: EggTimerDialKnob(
+                  rotationPercent: _rotationPercent(),
+                ),
               ),
             ]),
           ),

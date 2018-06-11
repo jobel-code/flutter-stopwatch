@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 
@@ -8,6 +10,11 @@ final Color GRADIENT_BOTTOM = const Color(0xFFE8E8E8);
 
 
 class EggTimerDialKnob extends StatefulWidget {
+  final rotationPercent;
+
+  const EggTimerDialKnob({this.rotationPercent});
+
+
   @override
   _EggTimerDialKnobState createState() => _EggTimerDialKnobState();
 }
@@ -17,12 +24,15 @@ class _EggTimerDialKnobState extends State<EggTimerDialKnob> {
   Widget build(BuildContext context) {
     return Stack(
         children: [
+
           Container(
             width: double.infinity,
             height: double.infinity,
             child: CustomPaint(
-
-              painter: ArrowPainter(),
+              // Independently transform the widget to rotate.
+              painter: ArrowPainter(
+                rotationPercent: widget.rotationPercent,
+              ),
             ),
           ),
 
@@ -55,10 +65,14 @@ class _EggTimerDialKnobState extends State<EggTimerDialKnob> {
 
               ),
               child: Center(
-                child: Image.network('https://avatars3.githubusercontent.com/u/14101776?s=400&v=4',
-                  width: 50.0,
-                  height: 50.0,
-                  color: Colors.black,),
+                child: Transform(
+                  transform: Matrix4.rotationZ(2 * pi * widget.rotationPercent),
+                  alignment: Alignment.center,
+                  child: Image.network('https://avatars3.githubusercontent.com/u/14101776?s=400&v=4',
+                    width: 50.0,
+                    height: 50.0,
+                    color: Colors.black,),
+                ),
               ),
             ),
           ),
@@ -72,8 +86,9 @@ class _EggTimerDialKnobState extends State<EggTimerDialKnob> {
 class ArrowPainter extends CustomPainter {
 
   final Paint dialArrowPaint;
+  final double rotationPercent;
 
-  ArrowPainter(): dialArrowPaint = Paint() {
+  ArrowPainter({this.rotationPercent}): dialArrowPaint = Paint() {
     dialArrowPaint.color = Colors.black;
     dialArrowPaint.style = PaintingStyle.fill;
   }
@@ -81,15 +96,18 @@ class ArrowPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     canvas.save();
-    // translates the center of the canvas
-    canvas.translate(size.width / 2, 0.0);
+
+    final radius = size.height / 2;
+    // translates now from the center of the canvas
+    canvas.translate(radius, radius);
+    canvas.rotate(2 * pi * rotationPercent);
 
     Path path = Path();
 
     // Creates the path
-    path.moveTo(0.0, -10.0); // tip of the triangle
-    path.lineTo(10.0, 5.0); // diagonal line at 45 degrees.
-    path.lineTo(-10.0, 5.0); // Horizontal line from right to left
+    path.moveTo(0.0, -radius -10.0); // tip of the triangle
+    path.lineTo(10.0,-radius + 5.0); // diagonal line at 45 degrees.
+    path.lineTo(-10.0, -radius + 5.0); // Horizontal line from right to left
     path.close();
 
     // Draw the path
