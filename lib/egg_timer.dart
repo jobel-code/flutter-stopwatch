@@ -53,6 +53,7 @@ class MyApp extends StatelessWidget {
                         child: Padding(
                           padding: const EdgeInsets.all(65.0),
                           child: Container(
+                            padding: EdgeInsets.all(10.0), // THIS is for the child border
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               gradient: LinearGradient(
@@ -68,7 +69,21 @@ class MyApp extends StatelessWidget {
                                 ),
                               ],
                             ),
-                            child: Container(),
+                            child: Container(
+
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: Color(0xFFDFDFDF),
+                                  width: 1.5
+
+                                )
+
+
+
+                              ),
+                              child: Container(),
+                            ),
                           ),
                         ),
                       ),
