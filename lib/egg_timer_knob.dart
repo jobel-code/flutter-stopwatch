@@ -8,12 +8,13 @@ final Color GRADIENT_TOP = const Color(0xFFF5F5F5);
 // ignore: non_constant_identifier_names
 final Color GRADIENT_BOTTOM = const Color(0xFFE8E8E8);
 
-
 class EggTimerDialKnob extends StatefulWidget {
+
   final rotationPercent;
 
-  const EggTimerDialKnob({this.rotationPercent});
-
+  EggTimerDialKnob({
+    this.rotationPercent,
+  });
 
   @override
   _EggTimerDialKnobState createState() => _EggTimerDialKnobState();
@@ -36,6 +37,7 @@ class _EggTimerDialKnobState extends State<EggTimerDialKnob> {
             ),
           ),
 
+
           Container(
             padding: EdgeInsets.all(10.0), // THIS is for the child border
             decoration: BoxDecoration(
@@ -54,15 +56,13 @@ class _EggTimerDialKnobState extends State<EggTimerDialKnob> {
               ],
             ),
             child: Container(
-
               decoration: BoxDecoration(
                   shape: BoxShape.circle,
+                  color: Colors.transparent,
                   border: Border.all(
                       color: Color(0xFFDFDFDF),
-                      width: 1.5
-
-                  )
-
+                      width: 1.5,
+                  ),
               ),
               child: Center(
                 child: Transform(
@@ -81,14 +81,14 @@ class _EggTimerDialKnobState extends State<EggTimerDialKnob> {
   }
 }
 
-
-
 class ArrowPainter extends CustomPainter {
 
   final Paint dialArrowPaint;
   final double rotationPercent;
 
-  ArrowPainter({this.rotationPercent}): dialArrowPaint = Paint() {
+  ArrowPainter({
+    this.rotationPercent
+  }) : dialArrowPaint = Paint() {
     dialArrowPaint.color = Colors.black;
     dialArrowPaint.style = PaintingStyle.fill;
   }

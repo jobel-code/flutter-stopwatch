@@ -1,73 +1,18 @@
-// Inspired by https://www.youtube.com/watch?v=svxUUz5mi9s&t=2147s
-
-import 'package:flutter/material.dart';
-// import 'package:fluttery/framing.dart';  // used for prototypes.
-import 'package:stopwatch/egg_timer_controls.dart';
-import 'package:stopwatch/egg_timer_time_display.dart';
-// import 'package:stopwatch/egg_timer_button.dart'; // Used now within the controls
-import 'package:stopwatch/egg_timer_dial.dart';
-
-final Color GRADIENT_TOP = const Color(0xFFF5F5F5);
-final Color GRADIENT_BOTTOM = const Color(0xFFE8E8E8);
-
-class MyApp extends StatefulWidget {
-  @override
-  _MyAppState createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  final EggTimer eggTimer;
-
-  _MyAppState() : eggTimer = EggTimer(maxTime: Duration(minutes: 35));
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(
-        fontFamily: 'BebasNeue',
-      ),
-      home: Scaffold(
-        // Container used to keep the color gradient of the background
-        body: Container(
-          decoration: BoxDecoration(
-              gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [GRADIENT_TOP, GRADIENT_BOTTOM])),
-          child: Center(
-            child: Column(
-              children: <Widget>[
-                EggTimerTimeDisplay(),
-                EggTimerDial(
-                  currentTime: eggTimer.currentTime,
-                  maxTime: eggTimer.maxTime,
-                  ticksPerSection: 5,
-                ),
-
-                Expanded(
-                  child: Container(),
-                ),
-
-                EggTimerControls(),
-
-                // From Fluttery/framing
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
+import 'dart:async';
 
 class EggTimer {
-  final Duration maxTime;
 
-  // Defaults
-  Duration _currentTime = Duration(seconds: 0);
+  final Duration maxTime;
+  final Function onTimerUpdate;
+  final Stopwatch stopwatch = new Stopwatch(); // Counts up
+  Duration _currentTime = const Duration(seconds: 0);
+  Duration lastStartTime = const Duration(seconds: 0); // helps to resume
   EggTimerState state = EggTimerState.ready;
 
-  EggTimer({this.maxTime});
+  EggTimer({
+    this.maxTime,
+    this.onTimerUpdate,
+  });
 
   get currentTime {
     return _currentTime;
@@ -78,6 +23,77 @@ class EggTimer {
     // only when ready and not while running.
     if (state == EggTimerState.ready) {
       _currentTime = newTime;
+      lastStartTime = currentTime;
+    }
+  }
+
+  resume() {
+    if (state != EggTimerState.running) {
+      if (state == EggTimerState.ready) {
+        _currentTime = _roundToTheNearestMinute(_currentTime);
+        lastStartTime = _currentTime;
+      }
+
+      state = EggTimerState.running;
+      stopwatch.start();
+
+      _tick();
+    }
+  }
+
+  _roundToTheNearestMinute(duration) {
+    return new Duration(
+      minutes: (duration.inSeconds / 60).round()
+    );
+  }
+
+  pause() {
+    if (state == EggTimerState.running) {
+      state = EggTimerState.paused;
+      stopwatch.stop();
+
+      if (null != onTimerUpdate) {
+        onTimerUpdate();
+      }
+    }
+  }
+
+  restart() {
+    if (state == EggTimerState.paused) {
+      state = EggTimerState.running;
+      _currentTime = lastStartTime;
+      stopwatch.reset();
+      stopwatch.start();
+
+      _tick();
+    }
+  }
+
+  reset() {
+    if (state == EggTimerState.paused) {
+      state = EggTimerState.ready;
+      _currentTime = const Duration(seconds: 0);
+      lastStartTime = _currentTime;
+      stopwatch.reset();
+
+      if (null != onTimerUpdate) {
+        onTimerUpdate();
+      }
+    }
+  }
+
+  _tick() {
+    print('Current time: ${_currentTime.inSeconds}');
+    _currentTime = lastStartTime - stopwatch.elapsed;
+
+    if (_currentTime.inSeconds > 0) {
+      new Timer(const Duration(seconds: 1), _tick);
+    } else {
+      state = EggTimerState.ready;
+    }
+
+    if (null != onTimerUpdate) {
+      onTimerUpdate();
     }
   }
 }
