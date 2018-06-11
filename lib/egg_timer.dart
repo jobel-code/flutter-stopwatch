@@ -1,10 +1,12 @@
 // Inspired by https://www.youtube.com/watch?v=svxUUz5mi9s&t=2147s
 
 import 'package:flutter/material.dart';
-import 'package:fluttery/framing.dart';
+// import 'package:fluttery/framing.dart';  // used for prototypes.
 import 'package:stopwatch/egg_timer_controls.dart';
 import 'package:stopwatch/egg_timer_time_display.dart';
-import 'package:stopwatch/egg_timer_button.dart';
+// import 'package:stopwatch/egg_timer_button.dart'; // Used now within the controls
+import 'package:stopwatch/egg_timer_dial.dart';
+
 
 final Color GRADIENT_TOP = const Color(0xFFF5F5F5);
 final Color GRADIENT_BOTTOM = const Color(0xFFE8E8E8);
@@ -28,73 +30,8 @@ class MyApp extends StatelessWidget {
             child: Column(
               children: <Widget>[
                 EggTimerTimeDisplay(),
-                Container(
-                  width: double.infinity,
-                  child: Padding(
-                    padding: EdgeInsets.only(left: 45.0, right: 45.0),
-                    child: AspectRatio(
-                      aspectRatio: 1.0,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [GRADIENT_TOP, GRADIENT_BOTTOM]),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Color(0x44000000),
-                              blurRadius: 2.0,
-                              spreadRadius: 1.0,
-                              offset: Offset(0.0, 1.0),
-                            ),
-                          ],
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(65.0),
-                          child: Container(
-                            padding: EdgeInsets.all(10.0), // THIS is for the child border
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              gradient: LinearGradient(
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                  colors: [GRADIENT_TOP, GRADIENT_BOTTOM]),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Color(0x44000000),
-                                  blurRadius: 2.0,
-                                  spreadRadius: 1.0,
-                                  offset: Offset(0.0, 1.0),
-                                ),
-                              ],
-                            ),
-                            child: Container(
+                EggTimerDial(),
 
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: Color(0xFFDFDFDF),
-                                  width: 1.5
-
-                                )
-
-
-
-                              ),
-                              child: Center(
-                                child: Image.network('https://avatars3.githubusercontent.com/u/14101776?s=400&v=4',
-                                width: 50.0,
-                                height: 50.0,
-                                color: Colors.black,),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
                 Expanded(
                   child: Container(),
                 ),
