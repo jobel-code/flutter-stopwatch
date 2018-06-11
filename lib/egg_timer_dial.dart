@@ -39,6 +39,9 @@ class _EggTimerDialState extends State<EggTimerDial> {
             child: Stack(
               children: <Widget>[
                 Container(
+                  // this padding controls where the ticks will be pushed from the outer circle
+                  padding: EdgeInsets.all(55.0),
+
                   width: double.infinity,
                   height: double.infinity,
                   child: CustomPaint(
@@ -104,8 +107,10 @@ class TickPainter extends CustomPainter {
       final tickLength = i % ticksPerSection == 0 ? LONG_TICK : SHORT_TICK;
 
       canvas.drawLine(
-          Offset(0.0, radius),
-          Offset(0.0, radius + tickLength), // negative goes up // plus keeps it on the exterior
+          Offset(0.0, -radius), // minus radius corrects the orientation
+                                // so the first LONG_TICK goes on top.
+          Offset(0.0, -radius - tickLength), // negative goes up
+                                             // plus keeps it on the exterior
           tickPaint
       );
       
