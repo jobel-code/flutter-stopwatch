@@ -82,7 +82,12 @@ class MyApp extends StatelessWidget {
 
 
                               ),
-                              child: Container(),
+                              child: Center(
+                                child: Image.network('https://avatars3.githubusercontent.com/u/14101776?s=400&v=4',
+                                width: 50.0,
+                                height: 50.0,
+                                color: Colors.black,),
+                              ),
                             ),
                           ),
                         ),
