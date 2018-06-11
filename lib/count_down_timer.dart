@@ -69,16 +69,13 @@ class MyAppState extends State<MyApp> with TickerProviderStateMixin {
                           },
                         ),
                       ),
+                      // the following controls the text
                       Align(
                         alignment: FractionalOffset.center,
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: <Widget>[
-                            Text(
-                              "Count Down",
-                              style: themeData.textTheme.subhead,
-                            ),
                             AnimatedBuilder(
                                 animation: controller,
                                 builder: (BuildContext context, Widget child) {
