@@ -33,14 +33,73 @@ class _EggTimerDialState extends State<EggTimerDial> {
                 ),
               ],
             ),
-            child: Padding(
-              padding: const EdgeInsets.all(65.0),
-              child: EggTimerDialKnob(),
+            // This padding pushes in from the outer circle
+            child: Stack(
+              children: <Widget>[
+                Container(
+                  width: double.infinity,
+                  height: double.infinity,
+                  child: CustomPaint(
+                    painter: TickPainter(
+
+                    )
+                  ),
+                ),
+
+                Padding(
+                  padding: const EdgeInsets.all(65.0),
+                  child: EggTimerDialKnob(),
+
+                ),
+              ]
             ),
           ),
         ),
       ),
     );
   }
+}
+
+
+
+class TickPainter extends CustomPainter {
+  final LONG_TICK = 14.0;
+  final SHORT_TICK = 4.0;
+
+  final tickCount;
+  final ticksPerSection;
+  final ticksInset;
+  final tickPaint;
+
+  TickPainter({
+    this.tickCount = 35,
+    this.ticksPerSection = 5,
+    this.ticksInset = 0.0,
+}) : tickPaint = Paint() {
+    tickPaint.color = Colors.black;
+    tickPaint.strokeWidth = 1.5;
+  }
+
+
+
+
+
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    canvas.translate(size.width / 2, 0.0);
+    canvas.drawLine(
+        Offset(0.0, 0.0), 
+        Offset(0.0, -SHORT_TICK), // negative goes up
+        tickPaint);
+    
+
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) {
+    return true;
+  }
+
 }
 
