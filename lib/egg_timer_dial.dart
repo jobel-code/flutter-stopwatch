@@ -123,6 +123,40 @@ class TickPainter extends CustomPainter {
         // Layout the text, to figure it out how large the text would be.
         textPainter.layout();
 
+
+        // Figure out which quadrant the text is in.
+        // Note that flutter counts quadrants clockwise, while the cartesian
+        // quadrants are counted counterClockWise.
+        final tickPercent = i / tickCount; // the percentage around the circle
+        var quadrant;
+
+        if (tickPercent < 0.25) {
+          quadrant = 1;
+        } else if (tickPercent < 0.5) {
+          quadrant = 4;
+        } else if (tickPercent < 0.75) {
+          quadrant = 3;
+        } else {
+          quadrant = 2;
+        }
+
+        // paint text according with the quadrant value
+        switch (quadrant) {
+          // case 1:
+          //  break; We remove this case so it would not rotate unnecessarily.
+          case 4:
+            canvas.rotate(-pi / 2);
+
+            break;
+          case 2:
+            // canvas.rotate(pi / 2);
+            // break;  without break case 2 would take the same values of case 3.
+          case 3:
+            canvas.rotate(pi / 2);
+            break;
+
+        }
+
         textPainter.paint(
           canvas,
           // the offset will help to recenter the text, because if it is zero,
@@ -135,6 +169,9 @@ class TickPainter extends CustomPainter {
               -textPainter.height / 2),
 
         );
+
+
+
 
 
         canvas.restore();
