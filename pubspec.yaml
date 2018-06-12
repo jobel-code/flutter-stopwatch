@@ -19,6 +19,7 @@ dependencies:
 
   fluttery: "^0.0.7"
   intl: "^0.15.6"
+  screen: "^0.0.3"
 
 dev_dependencies:
   flutter_test:
