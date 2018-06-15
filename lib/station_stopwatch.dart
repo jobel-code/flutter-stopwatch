@@ -11,7 +11,6 @@ final Color GRADIENT_BOTTOM = const Color(0xFFE8E8E8);
 final Color GRADIENT2_TOP = Colors.blue;
 final Color GRADIENT2_BOTTOM = Colors.blue;
 
-
 class MyApp extends StatefulWidget {
   @override
   MyAppState createState() => MyAppState();
@@ -20,9 +19,12 @@ class MyApp extends StatefulWidget {
 class MyAppState extends State<MyApp> with TickerProviderStateMixin {
   final Dependencies dependencies = new Dependencies();
 
-  VideoStationState videoStationState = VideoStationState.ready;
+  bool _active = false;
+  bool _started = false;
+  bool _extraTime = false;
+  bool _done = false;
 
-  int _progress = 0;
+  static const int videoTimeLengthInSeconds = 30;
 
   bool _keepScreenOn = true;
   final double strokeWidth = 50.0;
@@ -39,40 +41,73 @@ class MyAppState extends State<MyApp> with TickerProviderStateMixin {
     });
   }
 
-  void _restartStation() {
-    print('RESTARTING');
+  void _setStationStateIdle() {
     setState(() {
-      videoStationState = VideoStationState.ready;
-      _controller.reset();
-      _progress = 0;
-      dependencies.stopwatch.reset();
+      _active = false;
+      _started = false;
+      _extraTime = false;
+      _done = false;
     });
   }
 
-  void _incrementProgress() {
+  void _restartStation() {
+    print('RESTARTING');
     setState(() {
-      if (videoStationState != VideoStationState.done) {
-        _progress++;
-        if (_progress == 1) {
-          videoStationState = VideoStationState.startInProgress;
-          _controller.forward();
-          dependencies.stopwatch.start();
-        } else if (_progress == 2) {
-          videoStationState = VideoStationState.stopInProgress;
-          //_controller.reverse();
-          _controller.repeat();
-          //_controller.forward();
-
-          //_controller.reverse();
-        } else {
-          videoStationState = VideoStationState.done;
-          _controller.stop();
-          _controller.reset();
-          //dependencies.stopwatch.stop();
-          _progress = 0;
-        }
-      }
+      _controller.reset();
+      _controller.stop();
+      _setStationStateIdle();
+      dependencies.stopwatch.reset();
+      dependencies.stopwatch.stop();
     });
+  }
+
+  void startStation() {
+    _controller.reset();
+    _controller.forward();
+    dependencies.stopwatch.reset();
+    dependencies.stopwatch.start();
+    //TODO: popup dialog for depth start
+    //TODO: Show the time of start
+    //TODO: initialize GPS recording.
+  }
+
+  void StopAndAddExtraTime() {
+    _controller.reset();
+    _controller.forward();
+    //TODO: popup dialog for depth stop
+    //TODO: Show the time of stop
+    //TODO: Fix position
+    //TODO: continue until xtra time is done and stop GPS recording.
+  }
+
+  void setStationDone() {
+    setState(() {
+      _done = true;
+      if (_active) _active = false;
+      if (_started) _started = false;
+      if (_extraTime) _extraTime = false;
+      _controller.stop();
+      dependencies.stopwatch.stop();
+    });
+  }
+
+  void _handleTap() {
+    setState(() {
+      if (!_done) {
+      // Toggle value
+      _started = !_started;
+      if (!_active && _started) {
+        _active = true;
+        startStation();
+      } else if (_active && !_started && dependencies.stopwatch.elapsed.inSeconds > 30) {
+        _extraTime = true;
+        StopAndAddExtraTime();
+      } else if (_active && !_started && dependencies.stopwatch.elapsed.inSeconds < 30) {
+        print('Please wait until the started $videoTimeLengthInSeconds seconds are done before stoping the station.');
+      } else if (_active && _extraTime) {
+        setStationDone();
+      }
+    }});
   }
 
   @override
@@ -84,36 +119,23 @@ class MyAppState extends State<MyApp> with TickerProviderStateMixin {
     //initPlatformState();
 
     _controller = new AnimationController(
-      duration: const Duration(seconds: 30),
+      duration: const Duration(seconds: videoTimeLengthInSeconds),
       upperBound: 0.9,
       vsync: this,
     ); //..forward();
 
     _animation = new CurvedAnimation(
         parent: _controller,
-        curve: const Interval(0.0, 0.9, curve: Curves.linear),  // 0.0, 0.9
+        curve: const Interval(0.0, 0.9, curve: Curves.linear), // 0.0, 0.9
         reverseCurve: Curves.linear)
       ..addStatusListener((AnimationStatus status) {
-        if ((status == AnimationStatus.dismissed) &&  videoStationState == VideoStationState.stopInProgress ) {
-          print('ANIMATION is dismissed and Station is DONE!');
-          dependencies.stopwatch.stop();
-          videoStationState = VideoStationState.done;
-          _controller.reset();
+        if (status == AnimationStatus.dismissed) {
+          print('ANIMATION is dismissed!');
         } else if (status == AnimationStatus.completed) {
-          if (videoStationState == VideoStationState.startInProgress)
-            videoStationState == VideoStationState.stopInProgress;
-          else if (videoStationState == VideoStationState.stopInProgress)
-            videoStationState == VideoStationState.done;
-            //dependencies.stopwatch.stop();
-          _controller.stop();
+          print('ANIMATION is completed!');
 
+          if (_extraTime) setStationDone();
         }
-
-        //videoStationState = VideoStationState.stopInProgress;
-        //_controller.reverse();
-        //else if (status == AnimationStatus.dismissed &&
-        //    videoStationState == VideoStationState.done)
-
       });
 
     @override
@@ -124,6 +146,7 @@ class MyAppState extends State<MyApp> with TickerProviderStateMixin {
     }
   }
 
+  /*
   void _handleTap() {
     print(
         'Before setState: progress: $_progress  controller: ${_controller.status}  value: ${_controller.value} videoStatus: $videoStationState');
@@ -137,6 +160,7 @@ class MyAppState extends State<MyApp> with TickerProviderStateMixin {
 
     print('After setState: progress: $_progress  controller: ${_controller.status}  value: ${_controller.value} videoStatus: $videoStationState');
   }
+  */
 
   Widget _buildCircularProgressIndicator(BuildContext context, Widget child) {
     return SizedBox(
@@ -148,15 +172,17 @@ class MyAppState extends State<MyApp> with TickerProviderStateMixin {
         ));
   }
 
-  Color _statusColor(){
+  Color _statusColor() {
     Color c;
     setState(() {
-      if (videoStationState != VideoStationState.stopInProgress)
+      if (_active && !_extraTime) {
         c = Colors.blueAccent;
-      else c=Colors.orange;
+      } else if (_active && _extraTime || _done) {
+        c = Colors.orange;
+      }
+
       return c;
     });
-
   }
 
   @override
@@ -172,7 +198,7 @@ class MyAppState extends State<MyApp> with TickerProviderStateMixin {
               gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors:  [GRADIENT_TOP, GRADIENT_BOTTOM] )),
+                  colors: [GRADIENT_TOP, GRADIENT_BOTTOM])),
           child: Center(
             child: Column(
               children: <Widget>[
@@ -197,7 +223,7 @@ class MyAppState extends State<MyApp> with TickerProviderStateMixin {
                                   gradient: LinearGradient(
                                       begin: Alignment.topCenter,
                                       end: Alignment.bottomCenter,
-                                      colors:[GRADIENT_TOP, GRADIENT_BOTTOM]),
+                                      colors: [GRADIENT_TOP, GRADIENT_BOTTOM]),
                                   boxShadow: [
                                     BoxShadow(
                                       color: Color(0x44000000),
@@ -210,9 +236,10 @@ class MyAppState extends State<MyApp> with TickerProviderStateMixin {
                                 child: Container(),
                               ),
                               Theme(
-                                data: Theme
-                                    .of(context)
-                                    .copyWith(accentColor: _progress == 2? Colors.orange: Colors.blue),
+                                data: Theme.of(context).copyWith(
+                                    accentColor: _extraTime || _done
+                                        ? Colors.orange
+                                        : Colors.blue),
                                 child: Padding(
                                   padding: const EdgeInsets.all(24.0),
                                   child: new AnimatedBuilder(
@@ -246,12 +273,10 @@ class MyAppState extends State<MyApp> with TickerProviderStateMixin {
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       children: [
-
-                                        new Expanded(
-                                          child: new TimerText(
+                                        Expanded(
+                                          child: TimerText(
                                               dependencies: dependencies),
                                         ),
-
                                       ],
                                     ),
                                   ),
@@ -271,14 +296,6 @@ class MyAppState extends State<MyApp> with TickerProviderStateMixin {
   }
 }
 
-enum VideoStationState {
-  // approachingStation,
-  ready,
-  startInProgress,
-  stopInProgress,
-  done,
-  cancelled,
-}
 
 class ElapsedTime {
   final int hundreds;
@@ -396,7 +413,7 @@ class MinutesAndSecondsState extends State<MinutesAndSeconds> {
   Widget build(BuildContext context) {
     String minutesStr = (minutes % 60).toString().padLeft(2, '0');
     String secondsStr = (seconds % 60).toString().padLeft(2, '0');
-    return  Padding(
+    return Padding(
       padding: const EdgeInsets.all(10.0),
       child: FittedBox(
         fit: BoxFit.scaleDown,
@@ -410,25 +427,3 @@ class MinutesAndSecondsState extends State<MinutesAndSeconds> {
     );
   }
 }
-
-
-/*
-Padding(
-                                          padding: const EdgeInsets.all(10.0),
-                                          child: new FittedBox(
-                                            fit: BoxFit.scaleDown,
-                                            child: Text(
-                                              '00:30',
-                                              maxLines: 1,
-                                              textAlign: TextAlign.center,
-                                              style: const TextStyle(
-                                                color: Colors.black,
-                                                fontFamily: 'BebasNeue',
-                                                fontSize: 50.0,
-                                                fontWeight: FontWeight.bold,
-                                                letterSpacing: 10.0,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
- */
