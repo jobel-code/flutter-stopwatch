@@ -118,8 +118,7 @@ class MyAppState extends State<MyApp> with TickerProviderStateMixin {
               dependencies.stopwatch.elapsed.inSeconds < 30) {
             showInSnackBar(
                 'Please wait to finish current time before stoping the station.');
-            print(
-                'Please wait until the started $videoTimeLengthInSeconds seconds are done before stoping the station.');
+
           } else if (_active && _extraTime) {
             setStationDone(); }
            else if (_active &&
