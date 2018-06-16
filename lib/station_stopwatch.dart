@@ -110,7 +110,7 @@ class MyAppState extends State<MyApp> with TickerProviderStateMixin {
             startStation();
           } else if (_active &&
               _started &&
-              dependencies.stopwatch.elapsed.inSeconds > 30) {
+              dependencies.stopwatch.elapsed.inSeconds >= 30 && !_extraTime) {
             _extraTime = true;
             stopAndAddExtraTime();
           } else if (_active &&
@@ -121,8 +121,12 @@ class MyAppState extends State<MyApp> with TickerProviderStateMixin {
             print(
                 'Please wait until the started $videoTimeLengthInSeconds seconds are done before stoping the station.');
           } else if (_active && _extraTime) {
+            setStationDone(); }
+           else if (_active &&
+              _started &&
+              dependencies.stopwatch.elapsed.inSeconds >= 30 && _extraTime) {
             setStationDone();
-          }
+        }
         }
       },
     );
@@ -157,7 +161,7 @@ class MyAppState extends State<MyApp> with TickerProviderStateMixin {
           print('ANIMATION is completed!');
 
           if (_extraTime) setStationDone();
-        }
+        } // else if (status == AnimationStatus.forward && _extraTime) setStationDone();
       });
 
     @override
@@ -252,6 +256,7 @@ class MyAppState extends State<MyApp> with TickerProviderStateMixin {
                           onLongPress: _restartStation,
                           child: Stack(
                             children: <Widget>[
+
                               Container(
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
@@ -316,39 +321,26 @@ class MyAppState extends State<MyApp> with TickerProviderStateMixin {
                                   ),
                                 ),
                               ),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 275.0),
+                                child: Center(child: Row( mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    Icon(Icons.timer, size: 85.0,),
+
+                                    Text(_active || _done? '$startTime': "", style: TextStyle(fontFamily: 'Roboto',
+                                        fontSize: 40.0, color: Colors.black, fontWeight: FontWeight.bold), ),
+
+                                  ],
+                                )),
+                              ),
                             ],
                           ),
                         )),
                   ),
                 ),
+
                 SizedBox(
-                  height: 10.0,
-                ),
-                Container(
-                  color: Colors.white70,
-                  padding: EdgeInsets.all(16.0),
-                  height: 50.0,
-                  child: Row(
-                    children: <Widget>[
-                      Expanded(
-                        flex: 1,
-                        child: Container(
-                          color: Colors.white70,
-                          child: Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              'Start time: ',
-                              style: TextStyle(
-                                  fontSize: 35.0, color: Colors.black),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(
-                  height: 10.0,
+                  height: 25.0,
                 ),
                 Container(
                   color: Colors.white70,
