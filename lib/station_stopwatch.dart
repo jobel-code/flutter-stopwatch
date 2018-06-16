@@ -11,6 +11,9 @@ final Color GRADIENT_BOTTOM = const Color(0xFFE8E8E8);
 final Color GRADIENT2_TOP = Colors.blue;
 final Color GRADIENT2_BOTTOM = Colors.blue;
 
+final GlobalKey<ScaffoldState> _stopWatchScaffoldKey =
+    GlobalKey<ScaffoldState>();
+
 class MyApp extends StatefulWidget {
   @override
   MyAppState createState() => MyAppState();
@@ -23,6 +26,8 @@ class MyAppState extends State<MyApp> with TickerProviderStateMixin {
   bool _started = false;
   bool _extraTime = false;
   bool _done = false;
+
+  String startTime;
 
   static const int videoTimeLengthInSeconds = 30;
 
@@ -66,12 +71,13 @@ class MyAppState extends State<MyApp> with TickerProviderStateMixin {
     _controller.forward();
     dependencies.stopwatch.reset();
     dependencies.stopwatch.start();
+    startTime = getTimeUtc();
     //TODO: popup dialog for depth start
     //TODO: Show the time of start
     //TODO: initialize GPS recording.
   }
 
-  void StopAndAddExtraTime() {
+  void stopAndAddExtraTime() {
     _controller.reset();
     _controller.forward();
     //TODO: popup dialog for depth stop
@@ -92,22 +98,37 @@ class MyAppState extends State<MyApp> with TickerProviderStateMixin {
   }
 
   void _handleTap() {
-    setState(() {
-      if (!_done) {
-      // Toggle value
-      _started = !_started;
-      if (!_active && _started) {
-        _active = true;
-        startStation();
-      } else if (_active && !_started && dependencies.stopwatch.elapsed.inSeconds > 30) {
-        _extraTime = true;
-        StopAndAddExtraTime();
-      } else if (_active && !_started && dependencies.stopwatch.elapsed.inSeconds < 30) {
-        print('Please wait until the started $videoTimeLengthInSeconds seconds are done before stoping the station.');
-      } else if (_active && _extraTime) {
-        setStationDone();
-      }
-    }});
+    print(
+        'before Tap: started: $_started | active: $_active | extraTime: $_extraTime  | done: $_done');
+    setState(
+      () {
+        if (!_done) {
+          // Toggle value
+          if (!_active) _started = true;
+          if (!_active && _started) {
+            _active = true;
+            startStation();
+          } else if (_active &&
+              _started &&
+              dependencies.stopwatch.elapsed.inSeconds > 30) {
+            _extraTime = true;
+            stopAndAddExtraTime();
+          } else if (_active &&
+              _started &&
+              dependencies.stopwatch.elapsed.inSeconds < 30) {
+            showInSnackBar(
+                'Please wait to finish current time before stoping the station.');
+            print(
+                'Please wait until the started $videoTimeLengthInSeconds seconds are done before stoping the station.');
+          } else if (_active && _extraTime) {
+            setStationDone();
+          }
+        }
+      },
+    );
+    print(
+        'After Tap: started: $_started | active: $_active | extraTime: $_extraTime  | done: $_done');
+
   }
 
   @override
@@ -131,6 +152,7 @@ class MyAppState extends State<MyApp> with TickerProviderStateMixin {
       ..addStatusListener((AnimationStatus status) {
         if (status == AnimationStatus.dismissed) {
           print('ANIMATION is dismissed!');
+          //if (_extraTime) setStationDone();
         } else if (status == AnimationStatus.completed) {
           print('ANIMATION is completed!');
 
@@ -146,21 +168,15 @@ class MyAppState extends State<MyApp> with TickerProviderStateMixin {
     }
   }
 
-  /*
-  void _handleTap() {
-    print(
-        'Before setState: progress: $_progress  controller: ${_controller.status}  value: ${_controller.value} videoStatus: $videoStationState');
-    _incrementProgress();
 
-    // uncomment  here
-    //if (_controller.status == AnimationStatus.dismissed &&
-    //    videoStationState == VideoStationState.done) {
-    //  dependencies.stopwatch.stop();
-    //}
-
-    print('After setState: progress: $_progress  controller: ${_controller.status}  value: ${_controller.value} videoStatus: $videoStationState');
+  String getTimeUtc() {
+    // String dateSlug ="${startTime.year.toString()}-${startTime.month.toString().padLeft(2,'0')}-${startTime.day.toString().padLeft(2,'0')}";
+    String timeUtcString =
+        "${DateTime.now().toUtc().hour.toString().padLeft(2,'0')}:"
+        " ${DateTime.now().toUtc().minute.toString().padLeft(2,'0')}:"
+        "${DateTime.now().toUtc().second.toString().padLeft(2,'0')}";
+    return timeUtcString;
   }
-  */
 
   Widget _buildCircularProgressIndicator(BuildContext context, Widget child) {
     return SizedBox(
@@ -172,17 +188,12 @@ class MyAppState extends State<MyApp> with TickerProviderStateMixin {
         ));
   }
 
-  Color _statusColor() {
-    Color c;
-    setState(() {
-      if (_active && !_extraTime) {
-        c = Colors.blueAccent;
-      } else if (_active && _extraTime || _done) {
-        c = Colors.orange;
-      }
 
-      return c;
-    });
+  void showInSnackBar(String value) {
+    _stopWatchScaffoldKey.currentState.showSnackBar(new SnackBar(
+      content: new Text(value),
+      duration: Duration(seconds: 3),
+    ));
   }
 
   @override
@@ -192,6 +203,7 @@ class MyAppState extends State<MyApp> with TickerProviderStateMixin {
           // fontFamily: 'BebasNeue',
           ),
       home: Scaffold(
+        key: _stopWatchScaffoldKey,
         // Container used to keep the color gradient of the background
         body: Container(
           decoration: BoxDecoration(
@@ -202,9 +214,32 @@ class MyAppState extends State<MyApp> with TickerProviderStateMixin {
           child: Center(
             child: Column(
               children: <Widget>[
-                RandomColorBlock(
-                  width: double.infinity,
+                Container(
+                  color: Colors.pink[900],
+                  padding: EdgeInsets.all(16.0),
                   height: 150.0,
+                  child: Row(
+                    children: <Widget>[
+                      Expanded(
+                        flex: 1,
+                        child: Container(
+                          color: Colors.pink[900],
+                          child: Center(
+                            child: Text(
+                              'Station 01',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 80.0,
+                                  color: Colors.white),
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: 10.0,
                 ),
                 Container(
                   width: double.infinity,
@@ -274,9 +309,8 @@ class MyAppState extends State<MyApp> with TickerProviderStateMixin {
                                           MainAxisAlignment.center,
                                       children: [
                                         Expanded(
-                                          child: TimerText(
-                                              dependencies: dependencies),
-                                        ),
+                                            child: TimerText(
+                                                dependencies: dependencies)),
                                       ],
                                     ),
                                   ),
@@ -287,6 +321,85 @@ class MyAppState extends State<MyApp> with TickerProviderStateMixin {
                         )),
                   ),
                 ),
+                SizedBox(
+                  height: 10.0,
+                ),
+                Container(
+                  color: Colors.white70,
+                  padding: EdgeInsets.all(16.0),
+                  height: 50.0,
+                  child: Row(
+                    children: <Widget>[
+                      Expanded(
+                        flex: 1,
+                        child: Container(
+                          color: Colors.white70,
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              'Start time: ',
+                              style: TextStyle(
+                                  fontSize: 35.0, color: Colors.black),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: 10.0,
+                ),
+                Container(
+                  color: Colors.white70,
+                  padding: EdgeInsets.all(16.0),
+                  height: 100.0,
+                  child: Row(
+                    children: <Widget>[
+                      Expanded(
+                        flex: 1,
+                        child: Container(
+                          color: Colors.white70,
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              'Depth: ',
+                              style: TextStyle(
+                                  fontSize: 35.0, color: Colors.black),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 1,
+                        child: Container(
+                          child: Text(
+                            'start:',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 50.0,
+                                color: Colors.black),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 1,
+                        child: Container(
+                          child: Text(
+                            'end:',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 50.0,
+                                color: Colors.black),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: 10.0,
+                ),
               ],
             ),
           ),
@@ -295,7 +408,6 @@ class MyAppState extends State<MyApp> with TickerProviderStateMixin {
     );
   }
 }
-
 
 class ElapsedTime {
   final int hundreds;
